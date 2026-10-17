@@ -1,0 +1,679 @@
+﻿@model IEnumerable<Coffee_Shop.Models.Product>
+
+@{
+    ViewData["Title"] = "Our Menu";
+
+    var products = Model?.ToList() ?? new List<Coffee_Shop.Models.Product>();
+
+    var categories = products
+        .Where(p => !string.IsNullOrWhiteSpace(p.Category))
+        .Select(p => p.Category!)
+        .Distinct()
+        .OrderBy(c => c)
+        .ToList();
+}
+
+<style>
+    .serenity-menu {
+        --espresso: #39251f;
+        --coffee: #704735;
+        --caramel: #bd8b60;
+        --cream: #faf6f0;
+        --muted: #887b72;
+        color: var(--espresso);
+        background: var(--cream);
+        padding: 28px 0 70px;
+        font-family: "Segoe UI", sans-serif;
+    }
+
+        .serenity-menu * {
+            box-sizing: border-box;
+        }
+
+    .menu-hero {
+        position: relative;
+        overflow: hidden;
+        background: #39251f;
+        color: #fff9f0;
+        border-radius: 24px;
+        padding: 54px 42px;
+        margin-bottom: 48px;
+        isolation: isolate;
+    }
+
+        .menu-hero::before {
+            content: "";
+            position: absolute;
+            width: 290px;
+            height: 290px;
+            border: 1px solid rgba(255, 255, 255, .13);
+            border-radius: 50%;
+            right: -55px;
+            top: -105px;
+            box-shadow: 0 0 0 35px rgba(255,255,255,.025), 0 0 0 70px rgba(255,255,255,.025);
+            z-index: -1;
+        }
+
+    .menu-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        color: #e1b98e;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-size: .72rem;
+        font-weight: 700;
+        margin-bottom: 18px;
+    }
+
+    .menu-hero h1 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(2.5rem, 5vw, 4.1rem);
+        line-height: 1.08;
+        letter-spacing: -1.5px;
+        margin: 0 0 18px;
+        max-width: 600px;
+    }
+
+        .menu-hero h1 em {
+            color: #dfb98f;
+            font-weight: 400;
+        }
+
+    .menu-hero p {
+        color: #e2d5cc;
+        line-height: 1.8;
+        max-width: 490px;
+        margin: 0;
+        font-size: .96rem;
+    }
+
+    .hero-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 27px;
+        padding: 11px 16px;
+        border: 1px solid rgba(255,255,255,.2);
+        border-radius: 50px;
+        color: #f6e6d4;
+        font-size: .82rem;
+    }
+
+        .hero-note i {
+            color: #dfb98f;
+        }
+
+    .menu-section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .section-kicker {
+        color: var(--coffee);
+        font-size: .7rem;
+        text-transform: uppercase;
+        letter-spacing: 2.5px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .menu-section-heading h2 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: -.6px;
+    }
+
+    .menu-count {
+        color: var(--muted);
+        font-size: .85rem;
+        white-space: nowrap;
+        padding-bottom: 5px;
+    }
+
+    .menu-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .menu-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+    }
+
+    .menu-filter {
+        border: 1px solid #e6dacf;
+        border-radius: 30px;
+        padding: 9px 17px;
+        background: #fffdf9;
+        color: #6f5b4f;
+        font-size: .83rem;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+        .menu-filter:hover,
+        .menu-filter.active {
+            background: var(--espresso);
+            color: white;
+            border-color: var(--espresso);
+        }
+
+    .menu-search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 230px;
+        padding: 11px 15px;
+        background: white;
+        border: 1px solid #e6dacf;
+        border-radius: 30px;
+        color: var(--muted);
+    }
+
+        .menu-search input {
+            border: 0;
+            outline: 0;
+            background: transparent;
+            width: 100%;
+            min-width: 0;
+            color: var(--espresso);
+            font-size: .85rem;
+        }
+
+        .menu-search:focus-within {
+            border-color: var(--caramel);
+            box-shadow: 0 0 0 3px rgba(189,139,96,.12);
+        }
+
+    .menu-grid {
+        row-gap: 26px;
+    }
+
+    .menu-product {
+        height: 100%;
+        overflow: hidden;
+        background: #fffdf9;
+        border: 1px solid #eee5dc;
+        border-radius: 19px;
+        transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+        .menu-product:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 38px rgba(57,37,31,.10);
+        }
+
+    .product-image-wrap {
+        position: relative;
+        height: 235px;
+        overflow: hidden;
+        background: #eee3d7;
+    }
+
+    .product-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .45s ease;
+    }
+
+    .menu-product:hover .product-image {
+        transform: scale(1.055);
+    }
+
+    .product-category {
+        position: absolute;
+        left: 15px;
+        top: 15px;
+        background: rgba(255,253,249,.94);
+        color: var(--coffee);
+        border-radius: 30px;
+        padding: 7px 12px;
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .4px;
+        box-shadow: 0 3px 12px rgba(0,0,0,.06);
+    }
+
+    .product-details {
+        display: flex;
+        flex-direction: column;
+        padding: 21px;
+        min-height: 222px;
+    }
+
+        .product-details h3 {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin: 0 0 10px;
+            line-height: 1.25;
+        }
+
+    .product-description {
+        color: var(--muted);
+        font-size: .86rem;
+        line-height: 1.7;
+        margin: 0 0 22px;
+        overflow-wrap: anywhere;
+    }
+
+    .product-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: auto;
+        padding-top: 15px;
+        border-top: 1px solid #f0e8df;
+    }
+
+    .product-price-label {
+        display: block;
+        color: #98877b;
+        font-size: .68rem;
+        text-transform: uppercase;
+        letter-spacing: 1.1px;
+        margin-bottom: 3px;
+    }
+
+    .product-price {
+        color: var(--espresso);
+        font-weight: 750;
+        font-size: 1.15rem;
+    }
+
+    .add-cart-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        background: var(--espresso);
+        color: white;
+        text-decoration: none;
+        padding: 11px 14px;
+        border-radius: 10px;
+        font-size: .8rem;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: background .2s ease, transform .2s ease;
+        border: 0;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+        .add-cart-btn:hover {
+            background: #85583f;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .add-cart-btn:disabled {
+            opacity: .75;
+            cursor: wait;
+            transform: none;
+        }
+
+    .menu-empty {
+        display: none;
+        text-align: center;
+        padding: 55px 20px;
+        background: #fffdf9;
+        border: 1px dashed #dfcdbd;
+        border-radius: 18px;
+        color: var(--muted);
+    }
+
+        .menu-empty i {
+            display: block;
+            font-size: 2rem;
+            color: var(--caramel);
+            margin-bottom: 15px;
+        }
+
+        .menu-empty h3 {
+            color: var(--espresso);
+            font-family: Georgia, "Times New Roman", serif;
+        }
+
+    .menu-footer-note {
+        margin-top: 52px;
+        background: #f0e5d9;
+        border-radius: 17px;
+        padding: 25px;
+        text-align: center;
+        color: #715647;
+    }
+
+        .menu-footer-note i {
+            margin-right: 7px;
+            color: #9b6948;
+        }
+
+        .menu-footer-note p {
+            margin: 0;
+            font-size: .88rem;
+            line-height: 1.7;
+        }
+
+    @@media (max-width: 576px) {
+        .serenity-menu {
+            padding-top: 12px;
+        }
+
+        .menu-hero {
+            padding: 38px 24px;
+            border-radius: 18px;
+            margin-bottom: 35px;
+        }
+
+        .menu-section-heading {
+            align-items: start;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-toolbar {
+            align-items: stretch;
+        }
+
+        .menu-search {
+            width: 100%;
+        }
+
+        .product-image-wrap {
+            height: 220px;
+        }
+
+        .product-details {
+            padding: 18px;
+        }
+
+        .product-bottom {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+
+<div class="serenity-menu">
+    <div class="container">
+
+        <!-- Hero section -->
+        <section class="menu-hero">
+            <div class="menu-eyebrow">
+                <i class="fas fa-coffee"></i>
+                Welcome to Café Serenity
+            </div>
+
+            <h1>A little moment of <em>happiness.</em></h1>
+
+            <p>
+                Good coffee, comforting flavours, and a slower kind of day.
+                Explore our menu and find your next favourite.
+            </p>
+
+            <div class="hero-note">
+                <i class="fas fa-heart"></i>
+                Made for your moments of calm
+            </div>
+        </section>
+
+        <!-- Menu heading -->
+        <section>
+            <div class="menu-section-heading">
+                <div>
+                    <div class="section-kicker">Something delicious awaits</div>
+                    <h2>Explore our menu</h2>
+                </div>
+
+                <div class="menu-count">
+                    <span id="visibleCount">@products.Count</span>
+                    @(products.Count == 1 ? "item" : "items") to discover
+                </div>
+            </div>
+
+            <!-- Category filters and search -->
+            <div class="menu-toolbar">
+                <div class="menu-filters" id="menuFilters">
+                    <button type="button"
+                            class="menu-filter active"
+                            data-category="all">
+                        All items
+                    </button>
+
+                    @foreach (var category in categories)
+                    {
+                        <button type="button"
+                                class="menu-filter"
+                                data-category="@category">
+                            @category
+                        </button>
+                    }
+                </div>
+
+                <label class="menu-search">
+                    <i class="fas fa-search"></i>
+                    <input type="search"
+                           id="menuSearch"
+                           placeholder="Find your favourite..."
+                           aria-label="Search menu items" />
+                </label>
+            </div>
+
+            <!-- Product cards -->
+            <div class="row menu-grid" id="menuGrid">
+                @foreach (var product in products)
+                {
+                    <div class="col-lg-4 col-md-6 col-sm-6 menu-product-column"
+                         data-category="@(product.Category ?? "")"
+                         data-name="@(product.ProductName ?? "")">
+
+                        <article class="menu-product">
+                            <div class="product-image-wrap">
+                                @if (product.Image != null && product.Image.Length > 0)
+                                {
+                                    <img src="data:image/png;base64,@Convert.ToBase64String(product.Image)"
+                                         class="product-image"
+                                         alt="@product.ProductName"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <img src="~/images/no-image.png"
+                                         class="product-image"
+                                         alt="Image unavailable for @product.ProductName"
+                                         loading="lazy" />
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(product.Category))
+                                {
+                                    <span class="product-category">
+                                        @product.Category
+                                    </span>
+                                }
+                        </div>
+
+                        <div class="product-details">
+                            <h3>@product.ProductName</h3>
+
+                            <p class="product-description">
+                                @(string.IsNullOrWhiteSpace(product.Description)
+                                                                ? "A lovely choice for your next café moment."
+                                                                : product.Description)
+                            </p>
+
+                                <div class="product-bottom">
+                                    <div>
+                                        <span class="product-price-label">Your price</span>
+                                        <span class="product-price">
+                                            R @product.Price.ToString("0.00")
+                                        </span>
+                                    </div>
+
+                                    <button type="button"
+                                            class="add-cart-btn add-to-cart-button"
+                                            data-url="@Url.Action("AddToCartAjax", "Cart", new { id = product.ProductId })">
+                                        <i class="fas fa-shopping-bag"></i>
+                                        Add to cart
+                                    </button>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                                }
+            </div>
+
+            <!-- Empty state shown when search has no matches -->
+            <div class="menu-empty" id="menuEmpty">
+                <i class="fas fa-mug-hot"></i>
+                <h3>Nothing brewing here just yet.</h3>
+                <p>Try another search or choose a different category.</p>
+            </div>
+        </section>
+
+        <!-- Closing message -->
+        <div class="menu-footer-note">
+            <p>
+                <i class="fas fa-coffee"></i>
+                Take a breath, find your favourite, and make yourself at home.
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("menuSearch");
+            const filterButtons = document.querySelectorAll(".menu-filter");
+            const productCards = document.querySelectorAll(".menu-product-column");
+            const emptyMessage = document.getElementById("menuEmpty");
+            const visibleCount = document.getElementById("visibleCount");
+
+            let selectedCategory = "all";
+
+            // Search and category filtering
+            function filterProducts() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                let visible = 0;
+
+                productCards.forEach(function (card) {
+                    const category = (card.dataset.category || "").toLowerCase();
+                    const name = (card.dataset.name || "").toLowerCase();
+
+                    const description = (
+                        card.querySelector(".product-description")?.textContent || ""
+                    ).toLowerCase();
+
+                    const matchesCategory =
+                        selectedCategory === "all" ||
+                        category === selectedCategory.toLowerCase();
+
+                    const matchesSearch =
+                        name.includes(searchTerm) ||
+                        category.includes(searchTerm) ||
+                        description.includes(searchTerm);
+
+                    const shouldShow = matchesCategory && matchesSearch;
+
+                    card.style.display = shouldShow ? "" : "none";
+
+                    if (shouldShow) {
+                        visible++;
+                    }
+                });
+
+                visibleCount.textContent = visible;
+                emptyMessage.style.display = visible === 0 ? "block" : "none";
+            }
+
+            filterButtons.forEach(function (button) {
+                button.addEventListener("click", function () {
+                    filterButtons.forEach(function (item) {
+                        item.classList.remove("active");
+                    });
+
+                    button.classList.add("active");
+                    selectedCategory = button.dataset.category;
+
+                    filterProducts();
+                });
+            });
+
+            searchInput.addEventListener("input", filterProducts);
+
+            filterProducts();
+
+
+            // Track how many times each product is added during this page visit.
+            document.querySelectorAll(".add-to-cart-button").forEach(function (button) {
+                let addedQuantity = 0;
+
+                button.addEventListener("click", async function () {
+                    const originalText = button.innerHTML;
+
+                    button.disabled = true;
+                    button.innerHTML = addedQuantity > 0
+                        ? '<i class="fas fa-spinner fa-spin"></i> Adding another...'
+                        : '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+                    try {
+                        const response = await fetch(button.dataset.url);
+
+                        if (!response.ok) {
+                            throw new Error("Could not add product.");
+                        }
+
+                        const result = await response.json();
+
+                        if (!result.success) {
+                            throw new Error("Could not add product.");
+                        }
+
+                        addedQuantity++;
+
+                        // Update the cart count in both places.
+                        const navBadge = document.getElementById("cartCountBadge");
+                        const floatingBadge = document.getElementById("floatingCartCountBadge");
+
+                        if (navBadge) {
+                            navBadge.textContent = result.count;
+                        }
+
+                        if (floatingBadge) {
+                            floatingBadge.textContent = result.count;
+                        }
+
+                        // Keep the confirmation visible and offer another addition.
+                        button.innerHTML =
+                            '<i class="fas fa-check"></i> Added (' +
+                            addedQuantity +
+                            ') · Add another';
+
+                        button.disabled = false;
+                    }
+                    catch (error) {
+                        console.error("Add to cart error:", error);
+
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+
+                        alert("Sorry, we couldn't add this item. Please try again.");
+                    }
+                });
+            });
+        });
+    </script>
+}

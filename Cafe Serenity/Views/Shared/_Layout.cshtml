@@ -1,46 +1,461 @@
 ﻿<!DOCTYPE html>
+
 <html lang="en">
+
+
+@using System.Text.Json
+@using Coffee_Shop.Models
+
+@{
+            var cartJson = Context.Session.GetString("Cart");
+
+            var layoutCart = string.IsNullOrEmpty(cartJson)
+                            ? new List<Product>()
+                            : JsonSerializer.Deserialize<List<Product>>(cartJson)
+                                            ?? new List<Product>();
+
+            var layoutCartCount = layoutCart.Count;
+}
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Cafe_Serenity</title>
+    <title>@ViewData["Title"] - Coffee_Shop</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Cafe_Serenity.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Coffee_Shop.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
 </head>
 <body>
+
+    <style>
+        .bg-navy {
+            background-color: #8B4513;
+        }
+
+        .nav-cart-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-shrink: 0;
+            margin-left: 16px;
+            padding: 10px 15px;
+            color: #39251f;
+            background: #dfb98f;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: background .2s ease, transform .2s ease;
+        }
+
+            .nav-cart-link:hover {
+                background: #f1d2ad;
+                color: #39251f;
+                transform: translateY(-1px);
+            }
+
+        .cart-count-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 23px;
+            height: 23px;
+            padding: 0 5px;
+            border-radius: 50%;
+            background: #39251f;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Floating cart stays visible while the customer scrolls */
+        .floating-cart {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 99999;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 20px;
+            border-radius: 50px;
+            background: #39251f;
+            color: #fff9f0;
+            text-decoration: none;
+            font-size: .95rem;
+            font-weight: 700;
+            box-shadow: 0 8px 25px rgba(57, 37, 31, .28);
+            transition: transform .2s ease, background .2s ease;
+        }
+
+            .floating-cart:hover {
+                background: #704735;
+                color: white;
+                transform: translateY(-3px);
+            }
+
+            .floating-cart .cart-count-badge {
+                background: #dfb98f;
+                color: #39251f;
+            }
+
+
+
+        /* Café Serenity premium navigation */
+        .bg-navy {
+            background-color: #39251f;
+        }
+
+        .cafe-navbar {
+            background: #39251f;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(223, 185, 143, .35) !important;
+            box-shadow: 0 5px 22px rgba(57, 37, 31, .12);
+        }
+
+            .cafe-navbar .container-fluid {
+                display: flex;
+                align-items: center;
+                gap: 24px;
+            }
+
+        /* Brand on the left */
+        .cafe-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: #fff8ef;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+            .cafe-brand:hover {
+                color: #dfb98f;
+            }
+
+        .cafe-brand-icon {
+            width: 43px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dfb98f;
+            border-radius: 50%;
+            color: #dfb98f;
+            font-size: 19px;
+        }
+
+        .cafe-brand-name {
+            display: block;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.35rem;
+            letter-spacing: .4px;
+            line-height: 1.15;
+        }
+
+        .cafe-brand-tagline {
+            display: block;
+            margin-top: 4px;
+            color: #dfb98f;
+            font-size: .63rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Navigation links */
+        .cafe-navbar .navbar-collapse {
+            justify-content: center;
+        }
+
+        .cafe-navbar .navbar-nav {
+            align-items: center;
+            gap: 7px;
+        }
+
+        .cafe-navbar .nav-link {
+            position: relative;
+            padding: 12px 13px !important;
+            color: #f8eee2 !important;
+            font-size: .94rem;
+            font-weight: 500;
+            letter-spacing: .3px;
+            transition: color .2s ease;
+        }
+
+            .cafe-navbar .nav-link::after {
+                content: "";
+                position: absolute;
+                left: 13px;
+                right: 13px;
+                bottom: 5px;
+                height: 2px;
+                background: #dfb98f;
+                transform: scaleX(0);
+                transform-origin: center;
+                transition: transform .25s ease;
+            }
+
+            .cafe-navbar .nav-link:hover {
+                color: #dfb98f !important;
+            }
+
+                .cafe-navbar .nav-link:hover::after {
+                    transform: scaleX(1);
+                }
+
+            .cafe-navbar .nav-link:focus-visible,
+            .cafe-brand:focus-visible {
+                outline: 2px solid #dfb98f;
+                outline-offset: 4px;
+            }
+
+        .cafe-navbar .coffee-icon {
+            color: #dfb98f;
+            font-size: 1.1rem;
+        }
+
+        /* Preserve the existing cart appearance */
+        .cafe-navbar .nav-cart-link {
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        /* Mobile menu */
+        .cafe-navbar .navbar-toggler {
+            border: 1px solid rgba(223, 185, 143, .6);
+            padding: 8px 10px;
+        }
+
+            .cafe-navbar .navbar-toggler:focus {
+                box-shadow: 0 0 0 3px rgba(223, 185, 143, .2);
+            }
+
+        @@media (max-width: 991.98px) {
+            .cafe-navbar .container-fluid {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .cafe-navbar .navbar-collapse {
+                flex-basis: 100%;
+                order: 3;
+            }
+
+            .cafe-navbar .navbar-nav {
+                align-items: stretch;
+                padding: 12px 0 5px;
+                border-top: 1px solid rgba(223, 185, 143, .2);
+                margin-top: 8px;
+            }
+
+            .cafe-navbar .nav-link {
+                padding: 12px 5px !important;
+            }
+
+                .cafe-navbar .nav-link::after {
+                    display: none;
+                }
+
+                .cafe-navbar .nav-link:hover {
+                    padding-left: 12px !important;
+                }
+
+            .cafe-navbar .navbar-toggler {
+                order: 2;
+                margin-left: auto;
+            }
+
+            .cafe-navbar .nav-cart-link {
+                order: 1;
+                margin-left: auto;
+            }
+        }
+
+        @@media (max-width: 575.98px) {
+            .cafe-navbar {
+                padding: 12px 0;
+            }
+
+            .cafe-brand-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+            }
+
+            .cafe-brand-name {
+                font-size: 1.12rem;
+            }
+
+            .cafe-brand-tagline {
+                font-size: .55rem;
+                letter-spacing: 1.5px;
+            }
+        }
+
+        @@media (max-width: 575.98px) {
+            .nav-cart-link {
+                margin-left: 8px;
+                padding: 9px 11px;
+                gap: 6px;
+            }
+
+            .floating-cart {
+                right: 16px;
+                bottom: 16px;
+                padding: 13px 17px;
+            }
+        }
+    </style>
+
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Cafe_Serenity</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-navy cafe-navbar">
+            <div class="container-fluid px-3 px-lg-4">
+
+                <!-- Café Serenity brand -->
+                <a class="cafe-brand"
+                   asp-controller="Home"
+                   asp-action="Index"
+                   aria-label="Café Serenity home">
+
+                    <span class="cafe-brand-icon">
+                        <i class="fas fa-mug-hot"></i>
+                    </span>
+
+                    <span>
+                        <span class="cafe-brand-name">Café Serenity</span>
+                        <span class="cafe-brand-tagline">Your moment of calm</span>
+                    </span>
+                </a>
+
+                <!-- Mobile navigation toggle -->
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <!-- Navigation links -->
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav">
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index">
+                                Home
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="AboutUs">
+                                About Us
+                            </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Menu">
+                                Shop
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Privacy"
+                               aria-label="Coffee">
+                                <i class="fas fa-coffee coffee-icon"></i>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="Reviews">
+                                Reviews
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="Location">
+                                Location
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="ContactUs">
+                                Contact Us
+                            </a>
+                        </li>
+
                     </ul>
                 </div>
+
+                <!-- Existing cart button: unchanged -->
+                <a class="nav-cart-link"
+                   asp-controller="Cart"
+                   asp-action="Index"
+                   aria-label="Open shopping cart">
+
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>Cart</span>
+
+                    <span id="cartCountBadge" class="cart-count-badge">
+                        @layoutCartCount
+                    </span>
+                </a>
+
             </div>
         </nav>
     </header>
+
+    <!-- Floating cart: remains visible while scrolling -->
+    <a asp-controller="Cart"
+       asp-action="Index"
+       class="floating-cart"
+       aria-label="Open your shopping cart">
+
+        <i class="fas fa-shopping-bag"></i>
+        <span>View cart</span>
+
+        <span id="floatingCartCountBadge" class="cart-count-badge">
+            @layoutCartCount
+        </span>
+    </a>
+
     <div class="container">
+
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Cafe_Serenity - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <!-- Footer -->
+    <footer>
+        <p>© 2024 Café Serenity | All rights reserved.</p>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

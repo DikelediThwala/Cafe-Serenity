@@ -1,0 +1,737 @@
+﻿@model List<Coffee_Shop.Models.Product>
+
+@{
+    ViewData["Title"] = "Your Cart";
+
+    var cartItems = Model
+        .GroupBy(p => p.ProductId)
+        .Select(g => new
+        {
+            Product = g.First(),
+            Quantity = g.Count(),
+            Subtotal = g.First().Price * g.Count()
+        })
+        .ToList();
+
+    var totalItems = cartItems.Sum(x => x.Quantity);
+    var grandTotal = cartItems.Sum(x => x.Subtotal);
+}
+
+<style>
+    .serenity-cart {
+        --espresso: #39251f;
+        --coffee: #704735;
+        --caramel: #bd8b60;
+        --cream: #faf6f0;
+        --muted: #887b72;
+        color: var(--espresso);
+        background: var(--cream);
+        padding: 35px 0 75px;
+        font-family: "Segoe UI", sans-serif;
+        min-height: 70vh;
+    }
+
+        .serenity-cart * {
+            box-sizing: border-box;
+        }
+
+    .cart-heading {
+        margin-bottom: 30px;
+    }
+
+    .cart-eyebrow {
+        color: var(--coffee);
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .cart-heading h1 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(2.2rem, 4vw, 3.2rem);
+        font-weight: 600;
+        margin: 0 0 10px;
+    }
+
+    .cart-heading p {
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.7;
+    }
+
+    .cart-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 28px;
+        align-items: start;
+    }
+
+    .cart-items-panel,
+    .cart-summary,
+    .empty-cart {
+        background: #fffdf9;
+        border: 1px solid #eee5dc;
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(57, 37, 31, .04);
+    }
+
+    .cart-items-panel {
+        padding: 8px 24px;
+    }
+
+    .cart-panel-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 0;
+        border-bottom: 1px solid #f0e8df;
+    }
+
+        .cart-panel-heading h2 {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.35rem;
+            margin: 0;
+        }
+
+    .cart-item-count {
+        color: var(--coffee);
+        background: #f3e8dc;
+        padding: 6px 11px;
+        border-radius: 30px;
+        font-size: .78rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .cart-item {
+        display: grid;
+        grid-template-columns: 95px minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: center;
+        padding: 22px 0;
+        border-bottom: 1px solid #f0e8df;
+    }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+    .cart-item-image {
+        width: 95px;
+        height: 95px;
+        object-fit: cover;
+        border-radius: 14px;
+        background: #eee3d7;
+    }
+
+    .cart-item-image-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--caramel);
+        font-size: 1.8rem;
+    }
+
+    .cart-item-name {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin: 0 0 6px;
+        overflow-wrap: anywhere;
+    }
+
+    .cart-item-category {
+        color: var(--muted);
+        font-size: .8rem;
+        margin-bottom: 9px;
+    }
+
+    .cart-item-price {
+        color: var(--coffee);
+        font-weight: 700;
+        font-size: .9rem;
+    }
+
+    /* Quantity controls: minus, quantity and plus in one row */
+    .quantity-controls {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+        .quantity-controls form {
+            display: inline-flex;
+            margin: 0;
+        }
+
+    .quantity-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border: 1px solid #e6dacf;
+        border-radius: 9px;
+        background: #fff8f0;
+        color: var(--espresso);
+        cursor: pointer;
+        transition: background .2s ease, transform .2s ease;
+    }
+
+        .quantity-btn:hover {
+            background: #f0e0ce;
+            transform: translateY(-1px);
+        }
+
+        .quantity-btn.quantity-plus {
+            background: var(--espresso);
+            border-color: var(--espresso);
+            color: white;
+        }
+
+            .quantity-btn.quantity-plus:hover {
+                background: var(--coffee);
+                border-color: var(--coffee);
+            }
+
+        .quantity-btn:disabled,
+        .cart-remove-btn:disabled {
+            opacity: .55;
+            cursor: wait;
+            transform: none;
+        }
+
+    .quantity-number {
+        min-width: 20px;
+        text-align: center;
+        font-size: .95rem;
+        font-weight: 700;
+        color: var(--espresso);
+    }
+
+    /* Item subtotal and remove button */
+    .cart-item-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+        text-align: right;
+    }
+
+    .cart-item-subtotal {
+        display: block;
+        font-weight: 750;
+        font-size: 1.05rem;
+        white-space: nowrap;
+    }
+
+    .cart-remove-form {
+        margin: 0;
+    }
+
+    .cart-remove-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        border: 1px solid #ead7cf;
+        background: #fff8f5;
+        color: #a34736;
+        padding: 8px 11px;
+        border-radius: 9px;
+        font-family: inherit;
+        font-size: .78rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: .2s ease;
+    }
+
+        .cart-remove-btn:hover {
+            background: #a34736;
+            border-color: #a34736;
+            color: white;
+        }
+
+    /* Summary panel */
+    .cart-summary {
+        padding: 25px;
+        position: sticky;
+        top: 25px;
+    }
+
+        .cart-summary h2 {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.5rem;
+            margin: 0 0 22px;
+        }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 16px;
+        color: var(--muted);
+        font-size: .9rem;
+    }
+
+        .summary-row strong {
+            color: var(--espresso);
+            text-align: right;
+        }
+
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        border-top: 1px solid #eadfd4;
+        margin-top: 22px;
+        padding-top: 20px;
+    }
+
+        .summary-total span {
+            font-weight: 700;
+        }
+
+        .summary-total strong {
+            font-size: 1.45rem;
+            color: var(--coffee);
+            white-space: nowrap;
+        }
+
+    .cart-checkout-btn,
+    .continue-shopping-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 9px;
+        width: 100%;
+        border-radius: 11px;
+        padding: 13px 16px;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+    .cart-checkout-btn {
+        margin-top: 24px;
+        background: var(--espresso);
+        color: white;
+    }
+
+        .cart-checkout-btn:hover {
+            background: var(--coffee);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .continue-shopping-btn {
+        margin-top: 12px;
+        border: 1px solid #e6dacf;
+        background: transparent;
+        color: var(--coffee);
+    }
+
+        .continue-shopping-btn:hover {
+            background: #f3e8dc;
+            color: var(--espresso);
+        }
+
+    .cart-note {
+        color: var(--muted);
+        font-size: .76rem;
+        line-height: 1.6;
+        text-align: center;
+        margin: 18px 0 0;
+    }
+
+    /* Empty cart */
+    .empty-cart {
+        text-align: center;
+        padding: 65px 25px;
+    }
+
+    .empty-cart-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 85px;
+        height: 85px;
+        border-radius: 50%;
+        background: #f3e8dc;
+        color: var(--coffee);
+        font-size: 2rem;
+        margin: 0 auto 22px;
+    }
+
+    .empty-cart h2 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.9rem;
+        margin-bottom: 12px;
+    }
+
+    .empty-cart p {
+        color: var(--muted);
+        margin-bottom: 25px;
+    }
+
+    .empty-cart .continue-shopping-btn {
+        max-width: 230px;
+        margin: 0 auto;
+        background: var(--espresso);
+        color: white;
+    }
+
+    /* Small loading feedback */
+    .cart-updating {
+        opacity: .7;
+        pointer-events: none;
+    }
+
+    @@media (max-width: 900px) {
+        .cart-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .cart-summary {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .serenity-cart {
+            padding-top: 20px;
+        }
+
+        .cart-items-panel {
+            padding: 5px 15px;
+        }
+
+        .cart-item {
+            grid-template-columns: 72px minmax(0, 1fr);
+            gap: 13px;
+            align-items: start;
+        }
+
+        .cart-item-image {
+            width: 72px;
+            height: 72px;
+        }
+
+        .cart-item-actions {
+            grid-column: 2;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            gap: 10px;
+        }
+
+        .cart-item-subtotal {
+            margin: 0;
+        }
+
+        .cart-remove-btn {
+            padding: 7px 9px;
+            font-size: .74rem;
+        }
+
+        .cart-summary {
+            padding: 21px;
+        }
+    }
+</style>
+
+<div class="serenity-cart">
+    <div class="container">
+
+        <div class="cart-heading">
+            <div class="cart-eyebrow">
+                <i class="fas fa-coffee"></i> Café Serenity
+            </div>
+
+            <h1>Your shopping cart</h1>
+            <p>Your favourites, gathered in one place. Ready for something delicious?</p>
+        </div>
+
+        @if (cartItems.Count == 0)
+        {
+            <section class="empty-cart">
+                <div class="empty-cart-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+
+                <h2>Your cart is waiting for a little happiness.</h2>
+                <p>You haven't added anything to your cart yet.</p>
+
+                <a asp-controller="Home"
+                   asp-action="Menu"
+                   class="continue-shopping-btn">
+                    <i class="fas fa-mug-hot"></i>
+                    Explore the menu
+                </a>
+            </section>
+        }
+        else
+        {
+            <div class="cart-layout">
+
+                <section class="cart-items-panel">
+                    <div class="cart-panel-heading">
+                        <h2>Your selections</h2>
+
+                        <span class="cart-item-count">
+                            @totalItems @(totalItems == 1 ? "item" : "items")
+                        </span>
+                    </div>
+
+                    @foreach (var cartItem in cartItems)
+                    {
+                        var item = cartItem.Product;
+
+                        <article class="cart-item">
+                            @if (item.Image != null && item.Image.Length > 0)
+                            {
+                                <img src="data:image/png;base64,@Convert.ToBase64String(item.Image)"
+                                     class="cart-item-image"
+                                     alt="@item.ProductName" />
+                            }
+                            else
+                            {
+                                <div class="cart-item-image cart-item-image-placeholder">
+                                    <i class="fas fa-mug-hot"></i>
+                                </div>
+                            }
+
+                            <div class="cart-item-details">
+                                <h3 class="cart-item-name">@item.ProductName</h3>
+
+                                @if (!string.IsNullOrWhiteSpace(item.Category))
+                                {
+                                    <div class="cart-item-category">@item.Category</div>
+                                }
+
+                                <div class="cart-item-price">
+                                    R @item.Price.ToString("0.00") each
+                                </div>
+
+                                <div class="quantity-controls">
+                                    <form asp-controller="Cart"
+                                          asp-action="DecreaseQuantity"
+                                          method="post"
+                                          class="cart-ajax-form">
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.ProductId" />
+
+                                        <button type="submit"
+                                                class="quantity-btn"
+                                                aria-label="Decrease @item.ProductName quantity">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </form>
+
+                                    <span class="quantity-number">
+                                        @cartItem.Quantity
+                                    </span>
+
+                                    <form asp-controller="Cart"
+                                          asp-action="IncreaseQuantity"
+                                          method="post"
+                                          class="cart-ajax-form">
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@item.ProductId" />
+
+                                        <button type="submit"
+                                                class="quantity-btn quantity-plus"
+                                                aria-label="Increase @item.ProductName quantity">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="cart-item-actions">
+                                <span class="cart-item-subtotal">
+                                    R @cartItem.Subtotal.ToString("0.00")
+                                </span>
+
+                                <form asp-controller="Cart"
+                                      asp-action="RemoveItem"
+                                      method="post"
+                                      class="cart-ajax-form cart-remove-form">
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@item.ProductId" />
+
+                                    <button type="submit" class="cart-remove-btn">
+                                        <i class="fas fa-trash-alt"></i>
+                                        Remove item
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
+                    }
+
+                    <a asp-controller="Home"
+                       asp-action="Menu"
+                       class="continue-shopping-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Continue shopping
+                    </a>
+                </section>
+
+                <aside class="cart-summary">
+                    <h2>Order summary</h2>
+
+                    <div class="summary-row">
+                        <span>Unique products</span>
+                        <strong>@cartItems.Count</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Total quantity</span>
+                        <strong>@totalItems</strong>
+                    </div>
+
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <strong>R @grandTotal.ToString("0.00")</strong>
+                    </div>
+
+                    <a asp-controller="Home"
+                       asp-action="Menu"
+                       class="cart-checkout-btn">
+                        <i class="fas fa-coffee"></i>
+                        Keep exploring
+                    </a>
+
+                    <p class="cart-note">
+                        Your order total is calculated from the items currently in your cart.
+                    </p>
+                </aside>
+
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("submit", async function (event) {
+            const form = event.target.closest(".cart-ajax-form");
+
+            if (!form) {
+                return;
+            }
+
+            event.preventDefault();
+
+            // Prevent accidental double-clicks while the request is running.
+            if (form.dataset.submitting === "true") {
+                return;
+            }
+
+            form.dataset.submitting = "true";
+
+            const button = form.querySelector('button[type="submit"]');
+            const originalContent = button ? button.innerHTML : "";
+
+            if (button) {
+                button.disabled = true;
+                button.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i>';
+            }
+
+            const cartContainer = document.querySelector(".serenity-cart");
+
+            if (cartContainer) {
+                cartContainer.classList.add("cart-updating");
+            }
+
+            try {
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: new FormData(form),
+                    credentials: "same-origin",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("The server could not update the cart.");
+                }
+
+                // The controller redirects to Index; fetch follows that redirect.
+                const html = await response.text();
+                const parser = new DOMParser();
+                const updatedDocument = parser.parseFromString(
+                    html,
+                    "text/html"
+                );
+
+                const updatedCart = updatedDocument.querySelector(
+                    ".serenity-cart"
+                );
+
+                const currentCart = document.querySelector(
+                    ".serenity-cart"
+                );
+
+                if (!updatedCart || !currentCart) {
+                    throw new Error("Could not load the updated cart.");
+                }
+
+                // Replace only the cart content, leaving the rest of the page alone.
+                currentCart.replaceWith(updatedCart);
+
+                // Keep both cart counters in the navigation synchronised.
+                ["cartCountBadge", "floatingCartCountBadge"].forEach(
+                    function (badgeId) {
+                        const currentBadge =
+                            document.getElementById(badgeId);
+
+                        const updatedBadge =
+                            updatedDocument.getElementById(badgeId);
+
+                        if (currentBadge && updatedBadge) {
+                            currentBadge.textContent =
+                                updatedBadge.textContent.trim();
+                        }
+                    }
+                );
+            }
+            catch (error) {
+                console.error("Cart update error:", error);
+
+                if (cartContainer) {
+                    cartContainer.classList.remove("cart-updating");
+                }
+
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalContent;
+                }
+
+                form.dataset.submitting = "false";
+
+                alert("Sorry, we couldn't update your cart. Please try again.");
+            }
+        });
+    </script>
+}

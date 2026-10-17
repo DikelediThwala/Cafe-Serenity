@@ -1,0 +1,121 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+@if (ViewBag.Success != null)
+{
+    <div class="alert alert-success">@ViewBag.Success</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<style>
+    .btn-rounded {
+        border-radius: 50px;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .form-container {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-button {
+        width: 50%;
+        align-self: center;
+    }
+
+    .register-button {
+        background-color: white;
+        color: black;
+        border: 1px solid #007bff; /* Keep border for a clean look */
+    }
+
+    .profile-icon {
+        font-size: 100px; /* Increase icon size */
+        color: #007bff;
+        display: block;
+        margin: 20px auto;
+        border: 5px solid #007bff; /* Round border around the icon */
+        border-radius: 50%; /* Make the border round */
+        padding: 15px; /* Padding around the icon */
+        width: 140px; /* Set width to make it circular */
+        height: 140px; /* Set height to make it circular */
+        line-height: 100px; /* Vertically center the icon */
+    }
+
+    .register-message {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #333;
+    }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="row w-100 no-gutters justify-content-center">
+        <!-- Login Card (Left Side) -->
+        <div class="col-md-5 p-0">
+            <div class="card shadow-lg p-4" style="height: 500px;">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">Login</h3>
+                    <div class="text-center">
+                        <i class="fa fa-user profile-icon"></i> <!-- Font Awesome profile icon -->
+                    </div>
+                    <form method="post" asp-controller="Login" asp-action="Login" class="form-container">
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="Email" name="Email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="Password" name="Password" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary login-button btn-rounded">Login</button>
+
+                        <div class="text-center mt-3">
+                            <a href="#">Forgot Password?</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Card (Right Side) -->
+        <div class="col-md-3 p-0">
+            <div class="card shadow-lg p-4" style="height: 500px; background-image: url('/images/loginbackground.jpg'); background-size: cover; background-position: center;">
+                <br /> <br /> <br /> <br />
+                <h2 class="text-center mb-4" style="color:white">New Here?</h2>
+
+                <p class="register-message" style="color:white">Register an account to enjoy the best coffee in town and exclusive offers!</p>
+
+                <!-- Separate Register Form -->
+                <form method="post" asp-controller="Login" asp-action="Register" class="form-container">
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn register-button w-75 btn-rounded">Register</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

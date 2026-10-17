@@ -1,0 +1,229 @@
+﻿@model Coffee_Shop.Models.Product
+
+@{
+    Layout = "~/Views/Shared/_OwnerLayout.cshtml";
+    ViewData["Title"] = "Delete Item";
+}
+
+<style>
+    .delete-page {
+        max-width: 720px;
+        margin: 15px auto;
+        color: #34251f;
+    }
+
+    .delete-panel {
+        background: #fffdfb;
+        border: 1px solid #eee3da;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(63, 40, 27, .05);
+    }
+
+    .delete-header {
+        padding: 24px;
+        background: #50382b;
+        color: #fff8f1;
+    }
+
+        .delete-header span {
+            color: #d9b9a3;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .delete-header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 9px 0 6px;
+        }
+
+        .delete-header p {
+            color: #ead9cc;
+            font-size: 13px;
+            margin: 0;
+        }
+
+    .delete-content {
+        padding: 25px;
+    }
+
+    .warning {
+        display: flex;
+        gap: 12px;
+        padding: 15px;
+        border: 1px solid #f1d5d1;
+        background: #fff3f1;
+        color: #9e342d;
+        border-radius: 11px;
+        font-size: 12px;
+        line-height: 1.6;
+        margin-bottom: 22px;
+    }
+
+        .warning strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+    .delete-product {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px;
+        border: 1px solid #eee3da;
+        border-radius: 12px;
+        margin-bottom: 24px;
+    }
+
+        .delete-product img {
+            width: 85px;
+            height: 85px;
+            border-radius: 11px;
+            object-fit: cover;
+            background: #f2e6dc;
+        }
+
+        .delete-product h2 {
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0 0 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .delete-product p {
+            color: #8c7d73;
+            font-size: 12px;
+            margin: 0 0 7px;
+        }
+
+    .delete-price {
+        color: #50382b;
+        font-size: 14px;
+        font-weight: 800;
+    }
+
+    .delete-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-wrap: wrap;
+        border-top: 1px solid #f0e7df;
+        padding-top: 20px;
+    }
+
+    .cancel-btn, .confirm-delete-btn {
+        display: inline-block;
+        border-radius: 9px;
+        padding: 12px 17px;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .cancel-btn {
+        background: #f6ede5;
+        border: 1px solid #eddfd3;
+        color: #76503c;
+    }
+
+        .cancel-btn:hover {
+            background: #ead8c9;
+            color: #50382b;
+        }
+
+    .confirm-delete-btn {
+        background: #b42318;
+        border: 1px solid #b42318;
+        color: white;
+    }
+
+        .confirm-delete-btn:hover {
+            background: #922d27;
+            border-color: #922d27;
+        }
+
+    @@media (max-width: 520px) {
+        .delete-content {
+            padding: 17px;
+        }
+
+        .delete-product {
+            align-items: flex-start;
+        }
+
+            .delete-product img {
+                width: 68px;
+                height: 68px;
+            }
+
+        .delete-actions {
+            flex-direction: column-reverse;
+        }
+
+        .cancel-btn, .confirm-delete-btn {
+            text-align: center;
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="delete-page">
+    <div class="delete-panel">
+        <div class="delete-header">
+            <span>Menu management / Delete</span>
+            <h1>Delete item?</h1>
+            <p>Review the item below before confirming its removal.</p>
+        </div>
+
+        <div class="delete-content">
+            <div class="warning">
+                <div>⚠</div>
+                <div>
+                    <strong>This action cannot be undone.</strong>
+                    The selected product will be permanently removed from your database.
+                </div>
+            </div>
+
+            <div class="delete-product">
+                @if (Model.Image != null && Model.Image.Length > 0)
+                {
+                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.Image)"
+                         alt="@Model.ProductName" />
+                }
+                else
+                {
+                    <img src="~/images/no-image.png" alt="No product image" />
+                }
+
+                <div>
+                    <h2>@Model.ProductName</h2>
+                    <p>@Model.Category</p>
+                    <div class="delete-price">@($"R {Model.Price:0.00}")</div>
+                </div>
+            </div>
+
+            <form asp-controller="Product"
+                  asp-action="DeleteConfirmed"
+                  asp-route-id="@Model.ProductId"
+                  method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="delete-actions">
+                    <a asp-controller="Product"
+                       asp-action="ProductList"
+                       class="cancel-btn">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="confirm-delete-btn">
+                        Yes, Delete Item
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,627 @@
+﻿@model Coffee_Shop.Models.CoffeeProductViewModel
+
+@{
+    Layout = "~/Views/Shared/_OwnerLayout.cshtml";
+    ViewData["Title"] = "Edit Item";
+}
+
+<style>
+    .edit-page {
+        color: #34251f;
+        padding: 10px 0 35px;
+    }
+
+    .edit-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 26px;
+    }
+
+    .eyebrow {
+        color: #a36c4e;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .edit-heading h1 {
+        font-size: clamp(26px, 3vw, 34px);
+        font-weight: 800;
+        margin: 0 0 8px;
+        letter-spacing: -.8px;
+    }
+
+    .edit-heading p {
+        color: #8e8077;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .back-link {
+        color: #76503c;
+        background: #fffdfb;
+        border: 1px solid #e7d9ce;
+        border-radius: 10px;
+        padding: 11px 15px;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .back-link:hover {
+            background: #f5ebe3;
+            color: #50382b;
+        }
+
+    .edit-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.65fr) minmax(250px, .85fr);
+        gap: 24px;
+        align-items: start;
+    }
+
+    .edit-panel, .preview-panel {
+        background: #fffdfb;
+        border: 1px solid #eee3da;
+        border-radius: 17px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(63, 40, 27, .045);
+    }
+
+    .panel-heading {
+        padding: 22px 25px;
+        border-bottom: 1px solid #f0e7df;
+    }
+
+        .panel-heading h2 {
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0 0 5px;
+        }
+
+        .panel-heading p {
+            font-size: 12px;
+            color: #94867d;
+            margin: 0;
+        }
+
+    .form-content {
+        padding: 25px;
+    }
+
+    .section-label {
+        color: #a36c4e;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        margin-bottom: 18px;
+        text-transform: uppercase;
+    }
+
+    .field-group {
+        margin-bottom: 20px;
+    }
+
+        .field-group label {
+            display: block;
+            color: #4a3930;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+    .edit-page .form-control,
+    .edit-page .form-select {
+        width: 100%;
+        min-height: 46px;
+        padding: 11px 13px;
+        border: 1px solid #e6d9ce;
+        border-radius: 10px;
+        background: white;
+        color: #34251f;
+        font-size: 13px;
+        box-shadow: none;
+    }
+
+    .edit-page textarea.form-control {
+        min-height: 105px;
+        resize: vertical;
+    }
+
+    .edit-page .form-control:focus,
+    .edit-page .form-select:focus {
+        border-color: #a66c4e;
+        box-shadow: 0 0 0 3px rgba(166, 108, 78, .12);
+    }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .price-wrap {
+        position: relative;
+    }
+
+    .price-symbol {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #96725d;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .price-wrap input {
+        padding-left: 34px !important;
+    }
+
+    .current-image {
+        display: block;
+        width: 100%;
+        max-height: 190px;
+        object-fit: cover;
+        border-radius: 11px;
+        margin-bottom: 12px;
+        background: #f2e6dc;
+    }
+
+    .image-note {
+        font-size: 11px;
+        color: #95867c;
+        margin-top: 7px;
+        line-height: 1.6;
+    }
+
+    .validation-message {
+        display: block;
+        color: #b42318;
+        font-size: 11px;
+        margin-top: 5px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding-top: 21px;
+        margin-top: 8px;
+        border-top: 1px solid #f0e7df;
+    }
+
+    .cancel-link {
+        color: #83746a;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .save-button {
+        background: #50382b;
+        color: white;
+        border: 0;
+        border-radius: 10px;
+        padding: 13px 21px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+        .save-button:hover {
+            background: #76503c;
+        }
+
+    .preview-top {
+        padding: 22px;
+        background: #50382b;
+        color: #fff8f1;
+    }
+
+        .preview-top span {
+            color: #d9b9a3;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+            text-transform: uppercase;
+        }
+
+        .preview-top h2 {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 8px 0 0;
+        }
+
+    .preview-content {
+        padding: 20px;
+    }
+
+    .preview-image-wrap {
+        height: 190px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #f1e6dc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .preview-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .preview-placeholder {
+        color: #a58b78;
+        font-size: 12px;
+        text-align: center;
+    }
+
+        .preview-placeholder span {
+            display: block;
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+    .preview-category {
+        display: inline-block;
+        padding: 6px 10px;
+        margin-top: 17px;
+        border-radius: 30px;
+        background: #f3e6db;
+        color: #8d5e43;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .preview-name {
+        color: #34251f;
+        font-size: 19px;
+        font-weight: 800;
+        margin: 12px 0 7px;
+        overflow-wrap: anywhere;
+    }
+
+    .preview-description {
+        color: #8c7d73;
+        font-size: 12px;
+        line-height: 1.7;
+        min-height: 40px;
+        overflow-wrap: anywhere;
+    }
+
+    .preview-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        border-top: 1px solid #f0e7df;
+        padding-top: 16px;
+        margin-top: 16px;
+    }
+
+    .preview-price {
+        color: #50382b;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .preview-stock {
+        color: #85766b;
+        font-size: 11px;
+        text-align: right;
+    }
+
+    @@media (max-width: 950px) {
+        .edit-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .edit-heading {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .form-content {
+            padding: 18px;
+        }
+
+        .field-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .form-actions {
+            align-items: stretch;
+            flex-direction: column-reverse;
+        }
+
+        .save-button {
+            width: 100%;
+        }
+
+        .cancel-link {
+            text-align: center;
+            padding: 8px;
+        }
+    }
+</style>
+
+<div class="edit-page">
+    <div class="edit-heading">
+        <div>
+            <div class="eyebrow">Menu management / Edit</div>
+            <h1>Update item</h1>
+            <p>Make changes to your existing menu item.</p>
+        </div>
+
+        <a asp-controller="Product"
+           asp-action="ProductList"
+           class="back-link">
+            &larr; Back to products
+        </a>
+    </div>
+
+    <div class="edit-layout">
+        <div class="edit-panel">
+            <div class="panel-heading">
+                <h2>Item information</h2>
+                <p>Update the details you want customers to see.</p>
+            </div>
+
+            <form asp-controller="Product"
+                  asp-action="Edit"
+                  asp-route-id="@ViewContext.RouteData.Values["id"]"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "validation-message" })
+
+                <div class="form-content">
+                    <div class="section-label">01 — Basic details</div>
+
+                    <div class="field-group">
+                        <label asp-for="ProductName">Item name</label>
+                        <input asp-for="ProductName"
+                               id="ProductName"
+                               class="form-control"
+                               placeholder="Enter item name" />
+                        <span asp-validation-for="ProductName"
+                              class="validation-message"></span>
+                    </div>
+
+                    <div class="field-group">
+                        <label asp-for="Description">Description</label>
+                        <textarea asp-for="Description"
+                                  id="Description"
+                                  class="form-control"
+                                  placeholder="Describe this item"></textarea>
+                        <span asp-validation-for="Description"
+                              class="validation-message"></span>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field-group">
+                            <label asp-for="Category">Category</label>
+                            <select asp-for="Category"
+                                    id="Category"
+                                    class="form-select">
+                                <option value="">Select a category</option>
+                                <option value="Espresso">Espresso</option>
+                                <option value="Latte">Latte</option>
+                                <option value="Cappuccino">Cappuccino</option>
+                                <option value="Mocha">Mocha</option>
+                                <option value="Iced Coffee">Iced Coffee</option>
+                                <option value="Tea">Tea</option>
+                                <option value="Pastries">Pastries</option>
+                                <option value="Desserts">Desserts</option>
+                                <option value="Breakfast">Breakfast</option>
+                                <option value="Sandwiches">Sandwiches</option>
+                                <option value="Cold Drinks">Cold Drinks</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="Category"
+                                  class="validation-message"></span>
+                        </div>
+
+                        <div class="field-group">
+                            <label asp-for="Quantity">Available quantity</label>
+                            <input asp-for="Quantity"
+                                   id="Quantity"
+                                   type="number"
+                                   min="0"
+                                   class="form-control" />
+                            <span asp-validation-for="Quantity"
+                                  class="validation-message"></span>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label asp-for="Price">Selling price</label>
+                        <div class="price-wrap">
+                            <span class="price-symbol">R</span>
+                            <input asp-for="Price"
+                                   id="Price"
+                                   type="number"
+                                   min="0"
+                                   step="0.01"
+                                   class="form-control" />
+                        </div>
+                        <span asp-validation-for="Price"
+                              class="validation-message"></span>
+                    </div>
+
+                    <div class="section-label" style="margin-top: 28px;">
+                        02 — Product photography
+                    </div>
+
+                    @if (Model.ExistingImage != null && Model.ExistingImage.Length > 0)
+                    {
+                        <img id="currentImage"
+                             class="current-image"
+                             src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ExistingImage)"
+                             alt="Current product image" />
+                    }
+                    else
+                    {
+                        <img id="currentImage"
+                             class="current-image"
+                             alt="Product image preview"
+                             style="display:none;" />
+                        <p class="image-note">No image has been saved for this item yet.</p>
+                    }
+
+                    <div class="field-group">
+                        <label asp-for="Image">Replace item image (optional)</label>
+                        <input asp-for="Image"
+                               id="Image"
+                               type="file"
+                               accept="image/png,image/jpeg,image/webp"
+                               class="form-control" />
+                        <span asp-validation-for="Image"
+                              class="validation-message"></span>
+                        <div class="image-note">
+                            Leave this blank to keep the existing image.
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a asp-controller="Product"
+                           asp-action="ProductList"
+                           class="cancel-link">
+                            Cancel
+                        </a>
+
+                        <button type="submit" class="save-button">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <aside class="preview-panel">
+            <div class="preview-top">
+                <span>Customer view</span>
+                <h2>Menu item preview</h2>
+            </div>
+
+            <div class="preview-content">
+                <div class="preview-image-wrap">
+                    @if (Model.ExistingImage != null && Model.ExistingImage.Length > 0)
+                    {
+                        <img id="previewImage"
+                             src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ExistingImage)"
+                             alt="Menu item preview" />
+                    }
+                    else
+                    {
+                        <div id="previewPlaceholder" class="preview-placeholder">
+                            <span>☕</span>
+                            Your item image will appear here
+                        </div>
+                        <img id="previewImage" alt="Menu item preview" style="display:none;" />
+                    }
+                </div>
+
+                <span id="previewCategory" class="preview-category">
+                    @(string.IsNullOrWhiteSpace(Model.Category) ? "YOUR CATEGORY" : Model.Category)
+                </span>
+
+                <h3 id="previewName" class="preview-name">
+                    @(string.IsNullOrWhiteSpace(Model.ProductName) ? "Your item name" : Model.ProductName)
+                </h3>
+
+                <p id="previewDescription" class="preview-description">
+                    @(string.IsNullOrWhiteSpace(Model.Description) ? "Your item description will appear here." : Model.Description)
+                </p>
+
+                <div class="preview-bottom">
+                    <span id="previewPrice" class="preview-price">
+                        @($"R {Model.Price:0.00}")
+                    </span>
+                    <span id="previewStock" class="preview-stock">
+                        Stock: @Model.Quantity
+                    </span>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const name = document.getElementById("ProductName");
+        const description = document.getElementById("Description");
+        const category = document.getElementById("Category");
+        const price = document.getElementById("Price");
+        const quantity = document.getElementById("Quantity");
+        const imageInput = document.getElementById("Image");
+
+        const previewName = document.getElementById("previewName");
+        const previewDescription = document.getElementById("previewDescription");
+        const previewCategory = document.getElementById("previewCategory");
+        const previewPrice = document.getElementById("previewPrice");
+        const previewStock = document.getElementById("previewStock");
+        const previewImage = document.getElementById("previewImage");
+        const previewPlaceholder = document.getElementById("previewPlaceholder");
+        const currentImage = document.getElementById("currentImage");
+
+        function updatePreview() {
+            previewName.textContent = name.value.trim() || "Your item name";
+            previewDescription.textContent =
+                description.value.trim() || "Your item description will appear here.";
+            previewCategory.textContent = category.value || "YOUR CATEGORY";
+
+            const amount = Number.parseFloat(price.value);
+            previewPrice.textContent =
+                "R " + (Number.isFinite(amount) ? amount.toFixed(2) : "0.00");
+
+            previewStock.textContent = "Stock: " + (quantity.value || "0");
+        }
+
+        [name, description, category, price, quantity].forEach(function (field) {
+            field.addEventListener("input", updatePreview);
+            field.addEventListener("change", updatePreview);
+        });
+
+        imageInput.addEventListener("change", function () {
+            const file = imageInput.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith("image/")) {
+                imageInput.value = "";
+                alert("Please select a valid image.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                previewImage.src = event.target.result;
+                previewImage.style.display = "block";
+
+                if (previewPlaceholder) {
+                    previewPlaceholder.style.display = "none";
+                }
+
+                if (currentImage) {
+                    currentImage.src = event.target.result;
+                    currentImage.style.display = "block";
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+
+        updatePreview();
+    });
+</script>
