@@ -14,7 +14,7 @@ namespace Coffee_Shop.Controllers
         {
             _context = context;
         }
-
+        
         public IActionResult Index()
         {
             var cart = HttpContext.Session
